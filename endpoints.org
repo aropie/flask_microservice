@@ -1,0 +1,50 @@
+* User Service API :verb:
+template http://localhost:5000/v1
+Accept: application/json
+
+** Users
+template /users
+
+*** Create a user
+post
+Content-Type: application/json; charset=utf-8
+
+{
+  "first_name": "Juan",
+  "middle_name": "Roberto",
+  "father_surname": "Lopez",
+  "mother_surname": "Martinez",
+  "email": "blahblah@example.com",
+  "birth_date": "2019-01-01",
+  "cellphone": "5529464306"
+}
+
+*** List users
+get
+
+** Auth
+template /auth
+
+*** Register a user
+post /register
+Content-Type: application/json; charset=utf-8
+
+{
+  "first_name": "Juan",
+  "middle_name": "Roberto",
+  "father_surname": "Lopez",
+  "mother_surname": "Martinez",
+  "email": "blahblaha@examp.com",
+  "birth_date": "2019-01-01",
+  "cellphone": "5529464306",
+  "password": "superbadpass"
+}
+
+*** Login
+post /login
+Content-Type: application/json; charset=utf-8
+
+{
+  "email": "blahblaha@examp.com",
+  "password": "superbadpass"
+}
