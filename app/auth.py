@@ -1,15 +1,17 @@
 import functools
 
-from flask import Blueprint, jsonify, request
-
+from flask import Blueprint, jsonify, request, g
+from flask_httpauth import HTTPBasicAuth
+from sqlalchemy.orm.exc import NoResultFound
 import voluptuous as v
 import voluptuous.error as verr
 import voluptuous.humanize as vhum
 
 from app.models.user import UserAccountSchema
-from app.models import UserAccount, Credentials
+from app.models import UserAccount
 from app.db import DB
 from app.users import USER_VALIDATOR
+
 
 REGISTER_VALIDATOR = USER_VALIDATOR.extend({
     'password': str,
@@ -21,6 +23,7 @@ LOGIN_VALIDATOR = v.Schema({
 }, required=True)
 
 bp = Blueprint('auth', __name__, url_prefix='/v1/auth')
+auth = HTTPBasicAuth()
 
 
 @bp.route('/register', methods=('POST',))
@@ -40,7 +43,7 @@ def register():
 
     password = request.json.pop('password')
     new_user = UserAccount(**request.json)
-    new_user.save_password(password)
+    new_user.hash_password(password)
     DB.session.add(new_user)
     DB.session.commit()
 
@@ -48,23 +51,50 @@ def register():
     return schema.dumps(new_user)
 
 
-@bp.route('/login', methods=('POST',))
-def login():
-    try:
-        vhum.validate_with_humanized_errors(request.json,
-                                            LOGIN_VALIDATOR)
-    except verr.Error as invalid:
-        return jsonify({'message': str(invalid)}), 400
+@bp.route('/blah', methods=('GET', ))
+@auth.login_required
+def blah():
+    return 'YAS!'
 
-    email = request.json['email']
-    creds = Credentials.query.get(email)
-    if not creds:
-        return jsonify({'message': f'Invalid email'})
+@bp.route('/token')
+@auth.login_required
+def get_auth_token():
+    token = g.user.generate_auth_token()
+    return jsonify({'token': token.decode('ascii')})
 
-    if not creds.is_password_correct(request.json['password']):
-        return jsonify({'message': 'Incorrect email or password'}), 403
 
-    return 'Access Granted'
+# @bp.route('/login', methods=('POST',))
+# def login():
+#     try:
+#         vhum.validate_with_humanized_errors(request.json,
+#                                             LOGIN_VALIDATOR)
+#     except verr.Error as invalid:
+#         return jsonify({'message': str(invalid)}), 400
+
+#     email = request.json.get('email')
+#     password = request.json.get('password')
+
+#     if not ver:
+#         return jsonify({'message': 'Incorrect email or password'}), 403
+
+#     return 'Access Granted'
+
+
+@auth.verify_password
+def verify_password(username_or_token, password):
+    # Try to authenticate with token
+    user = UserAccount.verify_auth_token(username_or_token)
+    if not user:
+        # If not token, try to authenticate with user:pwd
+        try:
+            user = UserAccount.query.filter_by(email=username_or_token).one()
+        except NoResultFound:
+            return False
+        if not user.verify_password(password):
+            return False
+    g.user = user
+    return True
+
 
 
 def login_required(view):

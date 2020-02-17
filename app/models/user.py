@@ -1,20 +1,22 @@
 # coding: utf-8
 import datetime
 import crypt
-from sqlalchemy import Column, Integer, String, Date, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+
+from flask import current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 from marshmallow import Schema, fields
+from itsdangerous import (TimedJSONWebSignatureSerializer
+                          as Serializer, BadSignature, SignatureExpired)
 
 from app.db import DB
-from app.models import Credentials
-
 
 
 class UserAccount(DB.Model):
     __tablename__ = 'user_account'
 
     id = DB.Column(DB.Integer, primary_key=True)
+    salt = DB.Column(DB.String(16), nullable=False)
+    hashed_password = DB.Column(DB.String(94), nullable=False)
     first_name = DB.Column(DB.String(250), nullable=False)
     middle_name = DB.Column(DB.String(250), nullable=False)
     father_surname = DB.Column(DB.String(250), nullable=False)
@@ -26,14 +28,31 @@ class UserAccount(DB.Model):
                           default=datetime.datetime.utcnow())
     cellphone = DB.Column(DB.String(10), nullable=False)
 
-    def save_password(self, password):
-        salt = crypt.mksalt()
-        salted_password = password + salt
-        hashed_pwd = generate_password_hash(salted_password, salt_length=16)
-        login_details = Credentials(email=self.email,
-                                    hashed_password=hashed_pwd,
-                                    salt=salt)
-        DB.session.add(login_details)
+    def hash_password(self, password):
+        self.salt = crypt.mksalt()
+        salted_password = password + self.salt
+        self.hashed_password = generate_password_hash(salted_password,
+                                                      salt_length=16)
+
+    def verify_password(self, password):
+        salted_password = password + self.salt
+        return check_password_hash(self.hashed_password, salted_password)
+
+    def generate_auth_token(self, expiration=600):
+        s = Serializer(current_app.config['SECRET_KEY'], expires_in=expiration)
+        return s.dumps({'id': self.id})
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            return None  # valid token, but expired
+        except BadSignature:
+            return None  # invalid token
+        user = UserAccount.query.get(data['id'])
+        return user
 
 
 class UserAccountSchema(Schema):
