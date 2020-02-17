@@ -54,30 +54,14 @@ def register():
 @bp.route('/blah', methods=('GET', ))
 @auth.login_required
 def blah():
-    return 'YAS!'
+    return 'Success!'
+
 
 @bp.route('/token')
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token()
     return jsonify({'token': token.decode('ascii')})
-
-
-# @bp.route('/login', methods=('POST',))
-# def login():
-#     try:
-#         vhum.validate_with_humanized_errors(request.json,
-#                                             LOGIN_VALIDATOR)
-#     except verr.Error as invalid:
-#         return jsonify({'message': str(invalid)}), 400
-
-#     email = request.json.get('email')
-#     password = request.json.get('password')
-
-#     if not ver:
-#         return jsonify({'message': 'Incorrect email or password'}), 403
-
-#     return 'Access Granted'
 
 
 @auth.verify_password
@@ -94,12 +78,3 @@ def verify_password(username_or_token, password):
             return False
     g.user = user
     return True
-
-
-
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        pass
-
-    return wrapped_view
