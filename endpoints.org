@@ -1,5 +1,6 @@
 * User Service API :verb:
-template http://localhost:8000/v1
+template http://localhost:8000/api/v1
+Content-Type: application/json; charset=utf-8
 Accept: application/json
 
 ** Users
@@ -7,7 +8,6 @@ template /users
 
 *** Create a user
 post
-Content-Type: application/json; charset=utf-8
 
 {
   "first_name": "Juan",
@@ -27,14 +27,13 @@ template /auth
 
 *** Register a user
 post /register
-Content-Type: application/json; charset=utf-8
 
 {
   "first_name": "Juan",
   "middle_name": "Roberto",
   "father_surname": "Lopez",
   "mother_surname": "Martinez",
-  "email": "blahblaha@examp.com",
+  "email": "someemail@example.com",
   "birth_date": "2019-01-01",
   "cellphone": "5529464306",
   "password": "superbadpass"
@@ -42,7 +41,6 @@ Content-Type: application/json; charset=utf-8
 
 *** Login
 post /login
-Content-Type: application/json; charset=utf-8
 
 {
   "email": "blahblaha@examp.com",
@@ -51,9 +49,7 @@ Content-Type: application/json; charset=utf-8
 
 *** Get Token
 get /token
-Authorization: Basic YmxhaGJsYWhhQGV4YW1wbGUuY29tOnN1cGVyYmFkcGFzcw==
+Authorization: Basic c29tZWVtYWlsQGV4YW1wbGUuY29tOnN1cGVyYmFkcGFzcw==
 *** Blah
 get /blah
-# Authentication: Basic eyJhbGciOiJIUzUxMiIsImlhdCI6MTU4MTk3NTc1OCwiZXhwIjoxNTgxOTc2MzU4fQ.eyJlbWFpbCI6ImJsYWhibGFoYUBleGFtcGxlLmNvbSJ9.Ishtr6LBOcMpm2wOsl6c4WBhK9RCpA2EWHQXgoJMWaTIDFvm_5SpHHQa-IQmH8m-NpWkskZ2w_-PDmZ8R5tyeQ
-# Authentication: Basic eyJhbGciOiJIUzUxMiIsImlhdCI6MTU4MTk3NTkzNSwiZXhwIjoxNTgxOTc2NTM1fQ.eyJlbWFpbCI6ImJsYWhibGFoYUBleGFtcGxlLmNvbSJ9.PDgG4SyO1Hl3POwIIM34Kq2hObCvo3EXKqb--o5APBszdAKJO4IGiniBvsKV4KwLTWQmYnH7h5Eksgz-9gKibw
 Authentication: Basic ZXlKaGJHY2lPaUpJVXpVeE1pSXNJbWxoZENJNk1UVTRNVGszTlRrek5Td2laWGh3SWpveE5UZ3hPVGMyTlRNMWZRLmV5SmxiV0ZwYkNJNkltSnNZV2hpYkdGb1lVQmxlR0Z0Y0d4bExtTnZiU0o5LlBEZ0c0U3lPMUhsM1BPd0lJTTM0S3EyaE9iQ3ZvM0VYS3FiLS1vNUFQQnN6ZEFLSk80SUdpbmlCdnNLVjRLd0xUV1FtWW5IN2g1RWtzZ3otOWdLaWJ3

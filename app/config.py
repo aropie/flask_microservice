@@ -10,3 +10,6 @@ SQLALCHEMY_DATABASE_URI = os.getenv('DB_URI',
                                     f'postgresql://{DB_USER}:{DB_PASSWORD}'
                                     f'@{DB_HOST}:{DB_PORT}/{DB_DATABASE}')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+# Change this in prod
+SECRET_KEY = 'dev'
