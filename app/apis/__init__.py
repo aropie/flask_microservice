@@ -1,5 +1,5 @@
 from flask import Blueprint
-from flask_restplus import Api
+from flask_restx import Api
 
 from app.apis.auth import api as ns_auth
 from app.apis.users import api as ns_users
@@ -14,6 +14,11 @@ api.add_namespace(ns_users)
 authorizations = {
     'basic': {
         'type': 'basic',
+    },
+    'tokenAuth': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization',
     }
 }
 api.authorizations = authorizations

@@ -43,13 +43,10 @@ post /register
 post /login
 
 {
-  "email": "blahblaha@examp.com",
+  "email": "someemail@example.com",
   "password": "superbadpass"
 }
 
-*** Get Token
-get /token
-Authorization: Basic c29tZWVtYWlsQGV4YW1wbGUuY29tOnN1cGVyYmFkcGFzcw==
-*** Blah
-get /blah
+*** Test protected
+get /test
 Authentication: Basic ZXlKaGJHY2lPaUpJVXpVeE1pSXNJbWxoZENJNk1UVTRNVGszTlRrek5Td2laWGh3SWpveE5UZ3hPVGMyTlRNMWZRLmV5SmxiV0ZwYkNJNkltSnNZV2hpYkdGb1lVQmxlR0Z0Y0d4bExtTnZiU0o5LlBEZ0c0U3lPMUhsM1BPd0lJTTM0S3EyaE9iQ3ZvM0VYS3FiLS1vNUFQQnN6ZEFLSk80SUdpbmlCdnNLVjRLd0xUV1FtWW5IN2g1RWtzZ3otOWdLaWJ3

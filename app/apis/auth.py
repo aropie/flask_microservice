@@ -1,8 +1,9 @@
 from flask import request, g
-from flask_httpauth import HTTPBasicAuth
-from flask_restplus import Resource, Namespace
+from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
+from flask_restx import Resource, Namespace
 
 from sqlalchemy.orm.exc import NoResultFound
+import voluptuous as v
 import voluptuous.error as verr
 import voluptuous.humanize as vhum
 from werkzeug.exceptions import BadRequest, Conflict
@@ -13,7 +14,8 @@ from app.db import DB
 from app.apis.users import Users
 
 api = Namespace('auth', description='Authentication related operations')
-auth = HTTPBasicAuth()
+basic_auth = HTTPBasicAuth()
+token_auth = HTTPTokenAuth(scheme='Bearer')
 
 
 @api.route('/register')
@@ -51,30 +53,65 @@ class Register(Resource):
         return schema.dump(new_user), 201
 
 
-@api.route('/token')
-class GenerateToken(Resource):
+@api.route('/login')
+class Login(Resource):
+    LOGIN_VALIDATOR = v.Schema({
+        'email': v.Email(),
+        'password': str
+    }, required=True)
+
     @api.doc(responses={
-        200, 'Token generated',
-        401, 'Unauthorized',
+        200: 'Token generated',
+        400: 'Validation error',
+        401: 'Unauthorized',
     })
-    @auth.login_required
-    def get(self):
-        token = g.user.generate_auth_token()
-        return {'token': token.decode('ascii')}
-
-
-@auth.verify_password
-def verify_password(username_or_token, password):
-    # Try to authenticate with token
-    print(username_or_token, password)
-    user = UserAccount.verify_auth_token(username_or_token)
-    if not user:
-        # If no token, try to authenticate with user:pwd
+    def post(self):
         try:
-            user = UserAccount.query.filter_by(email=username_or_token).one()
+            vhum.validate_with_humanized_errors(request.json,
+                                                self.LOGIN_VALIDATOR)
+        except verr.Error as invalid:
+            raise BadRequest(str(invalid))
+
+        try:
+            user = UserAccount.query.filter_by(
+                email=request.json.get('email')).one()
         except NoResultFound:
-            return False
-        if not user.verify_password(password):
-            return False
+            raise BadRequest('Email or password incorrect')
+        if not user.verify_password(request.json.get('password')):
+            raise BadRequest('Email or password incorrect')
+
+        token = user.generate_auth_token()
+        payload = {
+            'token_type': 'bearer',
+            'access_token': token.decode('ascii'),
+            'expires_in': 600,
+            'refresh_token': 'TODO',
+        }
+        return payload
+
+
+@api.route('/test')
+class ProtectedEndpoint(Resource):
+    @token_auth.login_required
+    @api.doc(security='tokenAuth')
+    def get(self):
+        return 'YAS!'
+
+
+@token_auth.verify_token
+def verify_token(token):
+    user = UserAccount.verify_auth_token(token)
+    return bool(user)
+
+
+@basic_auth.verify_password
+def verify_password(username, password):
+    user = UserAccount.verify_auth_token(username)
+    try:
+        user = UserAccount.query.filter_by(email=username).one()
+    except NoResultFound:
+        return False
+    if not user.verify_password(password):
+        return False
     g.user = user
     return True

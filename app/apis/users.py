@@ -1,5 +1,5 @@
 from flask import request
-from flask_restplus import Resource, Namespace
+from flask_restx import Resource, Namespace
 
 import voluptuous as v
 import voluptuous.error as verr
