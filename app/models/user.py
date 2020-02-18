@@ -1,14 +1,23 @@
 # coding: utf-8
+import enum
 import datetime
 import crypt
 
 from flask import current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 from marshmallow import Schema, fields
+from marshmallow_enum import EnumField
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 
 from app.db import DB
+
+
+class Gender(enum.Enum):
+    M = 1,
+    F = 2,
+    O = 3,
+    U = 4
 
 
 class UserAccount(DB.Model):
@@ -21,7 +30,7 @@ class UserAccount(DB.Model):
     middle_name = DB.Column(DB.String(250), nullable=False)
     father_surname = DB.Column(DB.String(250), nullable=False)
     mother_surname = DB.Column(DB.String(250), nullable=False)
-    # sex = DB.Column(DB.String(250), nullable=False, choices=['M', 'F', 'U', 'NB'])
+    gender = DB.Column(DB.Enum(Gender), nullable=False)
     email = DB.Column(DB.String(250), nullable=False, unique=True)
     birth_date = DB.Column(DB.Date, nullable=False)
     joined_at = DB.Column(DB.DateTime, nullable=False,
@@ -61,7 +70,7 @@ class UserAccountSchema(Schema):
     middle_name = fields.Str()
     father_surname = fields.Str()
     mother_surname = fields.Str()
-    # sex = DB.Column(DB.String(250), nullable=False, choices=['M', 'F', 'U', 'NB'])
+    gender = EnumField(Gender)
     email = fields.Email()
     birth_date = fields.Date()
     joined_at = fields.DateTime()

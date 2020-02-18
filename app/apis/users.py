@@ -17,9 +17,11 @@ class Users(Resource):
 
     USER_VALIDATOR = v.Schema({
         'first_name': v.All(str, v.Length(min=1)),
-        v.Optional('middle_name'): v.All(str, v.Length(min=1)),
+        v.Optional('middle_name'): str,
         'father_surname': v.All(str, v.Length(min=1)),
         'mother_surname': v.All(str, v.Length(min=1)),
+        'gender': v.In(['M', 'F', 'O', 'U'],
+                       "Allowed values 'M', 'F', 'O', 'U'"),
         'email': v.Email(),
         'birth_date': v.Date(),
         'cellphone': v.All(str, v.Length(min=10, max=10)),

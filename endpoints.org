@@ -30,7 +30,8 @@ post /register
 
 {
   "first_name": "Juan",
-  "middle_name": "Roberto",
+  "middle_name": "",
+  "gender": "M",
   "father_surname": "Lopez",
   "mother_surname": "Martinez",
   "email": "someemail@example.com",
