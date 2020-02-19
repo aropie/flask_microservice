@@ -1,23 +1,19 @@
-from flask import request
-from flask_restx import Resource, Namespace, fields, Model
+from flask_restx import Resource, Namespace, fields
 
 import voluptuous as v
-import voluptuous.error as verr
-import voluptuous.humanize as vhum
-from werkzeug.exceptions import BadRequest
 
 from app.models import UserAccount
-from app import db
 
 
-api = Namespace('v1/users', description='User related operations')
+api = Namespace('users', description='User related operations')
 
 base_user_model = api.model('UserAccount', {
     'first_name': fields.String(required=True),
     'middle_name': fields.String(),
     'father_surname': fields.String(required=True),
     'mother_surname': fields.String(required=True),
-    'gender': fields.String(required=True, enum=['M', 'F', 'O', 'U']),
+    'gender': fields.String(required=True, enum=['M', 'F', 'O', 'U'],
+                            attribute=lambda x: x.gender.name),
     'email': fields.String(required=True),
     'birth_date': fields.Date(required=True),
     'cellphone': fields.String(required=True),
@@ -32,6 +28,7 @@ output_user_model = api.clone('UserAccountOutput', base_user_model, {
 })
 
 
+@api.route('/')
 class Users(Resource):
 
     USER_VALIDATOR = v.Schema({
@@ -46,20 +43,7 @@ class Users(Resource):
         'cellphone': v.All(str, v.Length(min=10, max=10)),
     }, required=True)
 
+    @api.marshal_with(output_user_model, skip_none=True, as_list=True)
     def get(self):
         users = UserAccount.query.all()
-        schema = UserAccountSchema(many=True)
-        return schema.dumps(users)
-
-    def post(self):
-        try:
-            vhum.validate_with_humanized_errors(request.json,
-                                                self.USER_VALIDATOR)
-        except verr.Error as invalid:
-            raise BadRequest(str(invalid))
-
-        new_user = UserAccount(**request.json)
-        db.session.add(new_user)
-        db.session.commit()
-        schema = UserAccountSchema()
-        return schema.dumps(new_user)
+        return users
