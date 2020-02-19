@@ -63,16 +63,3 @@ class UserAccount(db.Model):
             return None  # invalid token
         user = UserAccount.query.get(data['id'])
         return user
-
-
-class UserAccountSchema(Schema):
-    id = fields.Int()
-    first_name = fields.Str()
-    middle_name = fields.Str()
-    father_surname = fields.Str()
-    mother_surname = fields.Str()
-    gender = EnumField(Gender)
-    email = fields.Email()
-    birth_date = fields.Date()
-    joined_at = fields.DateTime()
-    cellphone = fields.Str()

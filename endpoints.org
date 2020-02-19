@@ -15,7 +15,7 @@ post /register
   "gender": "M",
   "father_surname": "Lopez",
   "mother_surname": "Martinez",
-  "email": "someemail@example.co",
+  "email": "someemail@example.com",
   "birth_date": "2019-01-01",
   "cellphone": "5529464306",
   "password": "nocontabanconmiastucia"
@@ -26,7 +26,7 @@ post /login
 
 {
   "email": "someemail@example.com",
-  "password": "superbadpass"
+  "password": "nocontabanconmiastucia"
 }
 
 *** Test protected

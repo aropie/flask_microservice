@@ -12,9 +12,6 @@ api.add_namespace(ns_auth)
 api.add_namespace(ns_users)
 
 authorizations = {
-    'basic': {
-        'type': 'basic',
-    },
     'tokenAuth': {
         'type': 'apiKey',
         'in': 'header',

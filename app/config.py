@@ -1,7 +1,11 @@
 import os
 
 
-class DevelopmentConfig:
+class BaseConfig:
+    RESTX_MASK_SWAGGER = False
+
+
+class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv('DB_URI', 'postgresql://'
                                         'postgres:@db/user_service')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -11,7 +15,7 @@ class DevelopmentConfig:
     TESTING = False
 
 
-class TestingConfig:
+class TestingConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv('DB_URI', 'postgresql://'
                                         'postgres:@db/user_service_test')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -21,7 +25,7 @@ class TestingConfig:
     TESTING = True
 
 
-class ProductionConfig:
+class ProductionConfig(BaseConfig):
     DB_USER = os.getenv('DB_USER')
     DB_PASSWORD = os.getenv('DB_PASSWORD')
     DB_HOST = os.getenv('DB_HOST')
