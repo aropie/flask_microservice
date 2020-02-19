@@ -6,8 +6,8 @@ import voluptuous.error as verr
 import voluptuous.humanize as vhum
 from werkzeug.exceptions import BadRequest
 
-from app.models.user import UserAccount, UserAccountSchema
-from app.db import DB
+from app.models.user_account import UserAccount, UserAccountSchema
+from app import db
 
 
 api = Namespace('v1/users', description='User related operations')
@@ -40,7 +40,7 @@ class Users(Resource):
             raise BadRequest(str(invalid))
 
         new_user = UserAccount(**request.json)
-        DB.session.add(new_user)
-        DB.session.commit()
+        db.session.add(new_user)
+        db.session.commit()
         schema = UserAccountSchema()
         return schema.dumps(new_user)

@@ -1,1 +1,1 @@
-from app.models.user import UserAccount
+from app.models.user_account import UserAccount

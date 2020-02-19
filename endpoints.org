@@ -3,6 +3,35 @@ template http://localhost:8000/api/v1
 Content-Type: application/json; charset=utf-8
 Accept: application/json
 
+** Auth
+template /auth
+
+*** Register a user
+post /register
+
+{
+  "first_name": "Juan",
+  "middle_name": "",
+  "gender": "M",
+  "father_surname": "Lopez",
+  "mother_surname": "Martinez",
+  "email": "someemail@example.co",
+  "birth_date": "2019-01-01",
+  "cellphone": "5529464306",
+  "password": "nocontabanconmiastucia"
+}
+
+*** Login
+post /login
+
+{
+  "email": "someemail@example.com",
+  "password": "superbadpass"
+}
+
+*** Test protected
+get /test
+Authorization: Bearer eyJhbGciOiJIUzUxMiIsImlhdCI6MTU4MjEzNzUxNiwiZXhwIjoxNTgyMTM4MTE2fQ.eyJpZCI6MX0.W7G3Mlk4ss3fVKB4Eshsh5BxiWkwyIHynIvHqnYcsJY2UuIHBUe_VKCPl5I47IM7Jf4XIswIQRGSQ8XFtRBALQ
 ** Users
 template /users
 
@@ -21,33 +50,3 @@ post
 
 *** List users
 get
-
-** Auth
-template /auth
-
-*** Register a user
-post /register
-
-{
-  "first_name": "Juan",
-  "middle_name": "",
-  "gender": "M",
-  "father_surname": "Lopez",
-  "mother_surname": "Martinez",
-  "email": "someemail@example.com",
-  "birth_date": "2019-01-01",
-  "cellphone": "5529464306",
-  "password": "superbadpass"
-}
-
-*** Login
-post /login
-
-{
-  "email": "someemail@example.com",
-  "password": "superbadpass"
-}
-
-*** Test protected
-get /test
-Authentication: Basic ZXlKaGJHY2lPaUpJVXpVeE1pSXNJbWxoZENJNk1UVTRNVGszTlRrek5Td2laWGh3SWpveE5UZ3hPVGMyTlRNMWZRLmV5SmxiV0ZwYkNJNkltSnNZV2hpYkdGb1lVQmxlR0Z0Y0d4bExtTnZiU0o5LlBEZ0c0U3lPMUhsM1BPd0lJTTM0S3EyaE9iQ3ZvM0VYS3FiLS1vNUFQQnN6ZEFLSk80SUdpbmlCdnNLVjRLd0xUV1FtWW5IN2g1RWtzZ3otOWdLaWJ3
