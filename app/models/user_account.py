@@ -5,8 +5,6 @@ import crypt
 
 from flask import current_app
 from werkzeug.security import check_password_hash, generate_password_hash
-from marshmallow import Schema, fields
-from marshmallow_enum import EnumField
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 
