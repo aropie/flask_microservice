@@ -10,7 +10,7 @@ from marshmallow_enum import EnumField
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 
-from app.db import DB
+from app import db
 
 
 class Gender(enum.Enum):
@@ -20,22 +20,22 @@ class Gender(enum.Enum):
     U = 4
 
 
-class UserAccount(DB.Model):
+class UserAccount(db.Model):
     __tablename__ = 'user_account'
 
-    id = DB.Column(DB.Integer, primary_key=True)
-    salt = DB.Column(DB.String(16), nullable=False)
-    hashed_password = DB.Column(DB.String(94), nullable=False)
-    first_name = DB.Column(DB.String(250), nullable=False)
-    middle_name = DB.Column(DB.String(250), nullable=False)
-    father_surname = DB.Column(DB.String(250), nullable=False)
-    mother_surname = DB.Column(DB.String(250), nullable=False)
-    gender = DB.Column(DB.Enum(Gender), nullable=False)
-    email = DB.Column(DB.String(250), nullable=False, unique=True)
-    birth_date = DB.Column(DB.Date, nullable=False)
-    joined_at = DB.Column(DB.DateTime, nullable=False,
+    id = db.Column(db.Integer, primary_key=True)
+    salt = db.Column(db.String(19), nullable=False)
+    hashed_password = db.Column(db.String(120), nullable=False)
+    first_name = db.Column(db.String(250), nullable=False)
+    middle_name = db.Column(db.String(250))
+    father_surname = db.Column(db.String(250), nullable=False)
+    mother_surname = db.Column(db.String(250), nullable=False)
+    gender = db.Column(db.Enum(Gender), nullable=False)
+    email = db.Column(db.String(250), nullable=False, unique=True)
+    birth_date = db.Column(db.Date, nullable=False)
+    joined_at = db.Column(db.DateTime, nullable=False,
                           default=datetime.datetime.utcnow())
-    cellphone = DB.Column(DB.String(10), nullable=False)
+    cellphone = db.Column(db.String(10), nullable=False)
 
     def hash_password(self, password):
         self.salt = crypt.mksalt()
@@ -53,6 +53,7 @@ class UserAccount(DB.Model):
 
     @staticmethod
     def verify_auth_token(token):
+        print(token)
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = s.loads(token)

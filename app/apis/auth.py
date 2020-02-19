@@ -6,16 +6,16 @@ from sqlalchemy.orm.exc import NoResultFound
 import voluptuous as v
 import voluptuous.error as verr
 import voluptuous.humanize as vhum
-from werkzeug.exceptions import BadRequest, Conflict
+from werkzeug.exceptions import BadRequest, Conflict, Unauthorized
 
-from app.models.user import UserAccountSchema
+from app.models.user_account import UserAccountSchema
 from app.models import UserAccount
-from app.db import DB
+from app import db
 from app.apis.users import Users
 
 api = Namespace('auth', description='Authentication related operations')
 basic_auth = HTTPBasicAuth()
-token_auth = HTTPTokenAuth(scheme='Bearer')
+token_auth = HTTPTokenAuth()
 
 
 @api.route('/register')
@@ -46,8 +46,8 @@ class Register(Resource):
         password = request.json.pop('password')
         new_user = UserAccount(**request.json)
         new_user.hash_password(password)
-        DB.session.add(new_user)
-        DB.session.commit()
+        db.session.add(new_user)
+        db.session.commit()
 
         schema = UserAccountSchema()
         return schema.dump(new_user), 201
@@ -76,9 +76,9 @@ class Login(Resource):
             user = UserAccount.query.filter_by(
                 email=request.json.get('email')).one()
         except NoResultFound:
-            raise BadRequest('Email or password incorrect')
+            raise Unauthorized('Email or password incorrect')
         if not user.verify_password(request.json.get('password')):
-            raise BadRequest('Email or password incorrect')
+            raise Unauthorized('Email or password incorrect')
 
         token = user.generate_auth_token()
         payload = {
