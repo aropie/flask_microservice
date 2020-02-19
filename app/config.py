@@ -13,7 +13,7 @@ class DevelopmentConfig:
 
 class TestingConfig:
     SQLALCHEMY_DATABASE_URI = os.getenv('DB_URI', 'postgresql://'
-                                        'postgres:@localhost/user_service_test')
+                                        'postgres:@db/user_service_test')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     SECRET_KEY = 'testing'
