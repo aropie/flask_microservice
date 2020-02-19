@@ -1,5 +1,4 @@
 import pytest
-import json
 
 BASE_URL = '/api/v1/auth'
 
@@ -98,7 +97,7 @@ def test_missing_argument(client, path, payload):
     assert rv.status_code == 400
 
 
-def test_register_user(client):
+def test_register_user(client, create_users):
     """Tests that users are created correctly."""
     payload = {
         'first_name': 'Juan',
@@ -122,7 +121,7 @@ def test_register_user(client):
         assert rv.json[key] == value
 
 
-def test_register_user_repeated_email(client):
+def test_register_user_repeated_email(client, create_users):
     """Tests an error is raised when creating a user with repeated email."""
     payload = {
         'first_name': 'Juan',
@@ -140,7 +139,7 @@ def test_register_user_repeated_email(client):
     assert rv.status_code == 409
 
 
-def test_login(client):
+def test_login(client, create_users):
     """Tests that a token is successfully generated."""
     payload = {
         'email': 'chespirito@example.com',
@@ -154,7 +153,8 @@ def test_login(client):
     assert rv.json.get('token_type') == 'bearer'
     assert 'access_token' in rv.json
 
-def test_login_incorrect_pasword(client):
+
+def test_login_incorrect_pasword(client, create_users):
     """Tests that a incorrect password throws a 401."""
     payload = {
         'email': 'chespirito@example.com',
@@ -167,7 +167,7 @@ def test_login_incorrect_pasword(client):
     assert rv.status_code == 401
 
 
-def test_login_incorrect_email(client):
+def test_login_incorrect_email(client, create_users):
     """Tests that an incorrect email throws a 401."""
     payload = {
         'email': 'bademail@example.com',
@@ -180,7 +180,7 @@ def test_login_incorrect_email(client):
     assert rv.status_code == 401
 
 
-def test_try_restricted_endpoint_without_token(client):
+def test_try_restricted_endpoint_without_token(client, create_users):
     """Tests that accessing a restricted endpoint is forbidden"""
     url = BASE_URL + '/test'
     rv = client.get(url)
@@ -188,7 +188,7 @@ def test_try_restricted_endpoint_without_token(client):
     assert rv.status_code == 401
 
 
-def test_access_restricted_endpoint_with_token(client):
+def test_access_restricted_endpoint_with_token(client, create_users):
     """Tests accessing a restricted endpoint with token"""
     payload = {
         'email': 'chespirito@example.com',
@@ -201,6 +201,6 @@ def test_access_restricted_endpoint_with_token(client):
 
     restricted_url = BASE_URL + '/test'
     rv = client.get(restricted_url,
-                    headers={'Authentication': f'Bearer {token}'})
+                    headers={'Authorization': f'Bearer {token}'})
 
     assert rv.status_code == 200
