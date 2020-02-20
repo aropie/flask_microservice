@@ -3,6 +3,7 @@ import os
 
 class BaseConfig:
     RESTX_MASK_SWAGGER = False
+    PRODUCTION = os.getenv('PRODUCTION', False)
 
 
 class DevelopmentConfig(BaseConfig):
