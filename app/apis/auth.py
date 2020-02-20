@@ -10,11 +10,16 @@ from werkzeug.exceptions import BadRequest, Conflict, Unauthorized
 
 from app.models import UserAccount
 from app import db
-from app.apis.users import Users, input_user_model, output_user_model
+from app.apis.users import Users, base_user_model, user_model
 
 api = Namespace('auth', description='Authentication related operations')
 basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth()
+
+
+register_model = api.clone('Register', base_user_model, {
+    'password': fields.String(required=True, discriminator=True),
+})
 
 login_model = api.model('Login', {
     'email': fields.String(required=True),
@@ -37,8 +42,8 @@ class Register(Resource):
     @api.doc(responses={
         400: 'Validation Error',
         409: 'Email already taken',
-    }, body=input_user_model)
-    @api.marshal_with(output_user_model, skip_none=True,
+    }, body=register_model)
+    @api.marshal_with(user_model, skip_none=True,
                       code=201, description='User created')
     def post(self):
         try:

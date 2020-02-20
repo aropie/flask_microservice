@@ -7,7 +7,7 @@ from app.models import UserAccount
 
 api = Namespace('users', description='User related operations')
 
-base_user_model = api.model('UserAccount', {
+base_user_model = api.model('BaseUser', {
     'first_name': fields.String(required=True),
     'middle_name': fields.String(),
     'father_surname': fields.String(required=True),
@@ -19,11 +19,7 @@ base_user_model = api.model('UserAccount', {
     'cellphone': fields.String(required=True),
 })
 
-input_user_model = api.clone('UserAccountInput', base_user_model, {
-    'password': fields.String(required=True, discriminator=True),
-})
-
-output_user_model = api.clone('UserAccountOutput', base_user_model, {
+user_model = api.clone('UserAccount', base_user_model, {
     'id': fields.Integer(discriminator=True),
 })
 
@@ -43,7 +39,7 @@ class Users(Resource):
         'cellphone': v.All(str, v.Length(min=10, max=10)),
     }, required=True)
 
-    @api.marshal_with(output_user_model, skip_none=True, as_list=True)
+    @api.marshal_with(user_model, skip_none=True, as_list=True)
     def get(self):
         users = UserAccount.query.all()
         return users
