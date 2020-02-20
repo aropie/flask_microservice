@@ -1,6 +1,8 @@
 CREATE DATABASE user_service;
 CREATE DATABASE user_service_test;
 
+\c user_service;
+
 CREATE TYPE gender AS ENUM ('M', 'F', 'O', 'U');
 
 CREATE TABLE user_account(
